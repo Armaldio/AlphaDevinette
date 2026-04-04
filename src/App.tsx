@@ -7,18 +7,18 @@ import React, { useState, useEffect } from 'react';
 import { StartScreen } from './components/StartScreen';
 import { GameScreen } from './components/GameScreen';
 import { EndScreen } from './components/EndScreen';
-import { generateSecretWords } from './lib/gemini';
+import { generateGameData, type GameData } from './lib/gemini';
 import { Moon, Sun } from 'lucide-react';
+import { Toaster, toast } from 'sonner';
 
 type GameState = 'start' | 'playing' | 'won' | 'lost';
 
 export default function App() {
   const [gameState, setGameState] = useState<GameState>('start');
-  const [secretWord, setSecretWord] = useState<string>('');
+  const [gameData, setGameData] = useState<GameData | null>(null);
   const [category, setCategory] = useState<string>('');
   const [difficulty, setDifficulty] = useState<string>('moyen');
   const [guesses, setGuesses] = useState<string[]>([]);
-  const [validWords, setValidWords] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
 
@@ -33,26 +33,24 @@ export default function App() {
   const handleStart = async (selectedCategory: string, selectedDifficulty: string) => {
     setIsLoading(true);
     try {
-      const words = await generateSecretWords(selectedCategory, selectedDifficulty);
+      const data = await generateGameData(selectedCategory, selectedDifficulty);
       setIsLoading(false);
 
-      if (words.length > 0) {
-        const randomWord = words[Math.floor(Math.random() * words.length)];
-        setSecretWord(randomWord);
+      if (data) {
+        setGameData(data);
         setCategory(selectedCategory);
         setDifficulty(selectedDifficulty);
-        setValidWords(words);
         setGuesses([]);
         setGameState('playing');
       } else {
-        alert('Impossible de générer des mots pour cette catégorie. Veuillez en essayer une autre.');
+        toast.error('Impossible de préparer le jeu pour cette catégorie.');
       }
     } catch (error: any) {
       setIsLoading(false);
       if (error.message === "QUOTA_EXCEEDED") {
-        alert("Le quota de l'API est dépassé. Veuillez patienter un instant avant de réessayer.");
+        toast.error("Quota API dépassé. Veuillez patienter.");
       } else {
-        alert("Une erreur est survenue lors de la génération des mots. Veuillez réessayer.");
+        toast.error("Une erreur est survenue lors de la génération.");
       }
     }
   };
@@ -68,14 +66,14 @@ export default function App() {
 
   const handlePlayAgain = () => {
     setGameState('start');
-    setSecretWord('');
+    setGameData(null);
     setCategory('');
     setGuesses([]);
-    setValidWords([]);
   };
 
   return (
     <div className="font-sans antialiased selection:bg-indigo-200 selection:text-indigo-900 min-h-screen bg-stone-50 dark:bg-stone-950 text-stone-900 dark:text-stone-50 transition-colors duration-300">
+      <Toaster position="top-center" richColors />
       <button
         onClick={() => setIsDarkMode(!isDarkMode)}
         className="fixed top-4 right-4 z-50 p-2 rounded-full bg-stone-200 dark:bg-stone-800 text-stone-600 dark:text-stone-300 hover:bg-stone-300 dark:hover:bg-stone-700 transition-colors"
@@ -87,19 +85,20 @@ export default function App() {
       {gameState === 'start' && (
         <StartScreen onStart={handleStart} isLoading={isLoading} />
       )}
-      {gameState === 'playing' && (
+      
+      {gameState === 'playing' && gameData && (
         <GameScreen 
-          secretWord={secretWord} 
+          gameData={gameData}
           category={category}
           difficulty={difficulty}
-          validWords={validWords}
           onWin={handleWin} 
           onGiveUp={handleGiveUp} 
         />
       )}
-      {(gameState === 'won' || gameState === 'lost') && (
+      
+      {(gameState === 'won' || gameState === 'lost') && gameData && (
         <EndScreen 
-          secretWord={secretWord} 
+          gameData={gameData}
           category={category}
           guesses={guesses} 
           isWin={gameState === 'won'} 

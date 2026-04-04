@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { ArrowUp, ArrowDown, Send, CheckCircle2, Loader2, XCircle, Lightbulb } from 'lucide-react';
-import { validateGuessWithGemini, generateHint } from '../lib/gemini';
+import { validateGuessWithGemini, type GameData } from '../lib/gemini';
 
 function getEditDistance(a: string, b: string): number {
   if (a.length === 0) return b.length;
@@ -44,10 +44,9 @@ function isCloseEnough(guess: string, secret: string): boolean {
 }
 
 interface GameScreenProps {
-  secretWord: string;
+  gameData: GameData;
   category: string;
   difficulty: string;
-  validWords: string[];
   onWin: (guesses: string[]) => void;
   onGiveUp: () => void;
 }
@@ -57,12 +56,12 @@ interface GuessRecord {
   relation: 'before' | 'after' | 'exact' | 'pending' | 'invalid' | 'hint';
 }
 
-export function GameScreen({ secretWord, category, difficulty, validWords, onWin, onGiveUp }: GameScreenProps) {
+export function GameScreen({ gameData, category, difficulty, onWin, onGiveUp }: GameScreenProps) {
+  const { word: secretWord, hints } = gameData;
   const [input, setInput] = useState('');
   const [guesses, setGuesses] = useState<GuessRecord[]>([]);
   const [error, setError] = useState('');
   const [hintsUsed, setHintsUsed] = useState(0);
-  const [isFetchingHint, setIsFetchingHint] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const endOfListRef = useRef<HTMLDivElement>(null);
 
@@ -96,14 +95,12 @@ export function GameScreen({ secretWord, category, difficulty, validWords, onWin
   const leftPercent = (minVal / 25) * 100;
   const widthPercent = Math.max(2, ((maxVal - minVal) / 25) * 100);
 
-  const handleHint = async () => {
-    if (hintsUsed >= 3 || isFetchingHint) return;
-    setIsFetchingHint(true);
+  const handleHint = () => {
+    if (hintsUsed >= 3) return;
     const nextLevel = hintsUsed + 1;
-    const hintText = await generateHint(secretWord, category, nextLevel);
+    const hintText = hints[nextLevel - 1];
     setHintsUsed(nextLevel);
     setGuesses(prev => [...prev, { word: hintText, relation: 'hint' }]);
-    setIsFetchingHint(false);
     setTimeout(() => endOfListRef.current?.scrollIntoView({ behavior: 'smooth' }), 100);
   };
 
@@ -113,16 +110,14 @@ export function GameScreen({ secretWord, category, difficulty, validWords, onWin
 
     if (!guess) return;
     
-    // Check if already guessed (case-insensitive)
     if (guesses.some(g => g.relation !== 'hint' && g.word.toLowerCase() === guess.toLowerCase())) {
       setError('Vous avez déjà proposé ce mot !');
       return;
     }
 
     setError('');
-    setInput(''); // Clear input immediately for fast typing
+    setInput(''); 
     
-    // Check for exact match first (with typo tolerance)
     if (isCloseEnough(guess, secretWord)) {
       const newGuess: GuessRecord = { word: guess, relation: 'exact' };
       setGuesses(prev => {
@@ -133,31 +128,22 @@ export function GameScreen({ secretWord, category, difficulty, validWords, onWin
       return;
     }
 
-    // Add as pending
     const newGuess: GuessRecord = { word: guess, relation: 'pending' };
     setGuesses(prev => [...prev, newGuess]);
 
-    // Check if it's in the initial list
-    let isValid = false;
-    if (validWords.some(w => isCloseEnough(guess, w))) {
-      isValid = true;
-    } else {
-      // Validate with Gemini in the background
-      isValid = await validateGuessWithGemini(guess, category);
-    }
+    // Simplified: No validWords pool, rely on AI-only validation
+    const isValid = await validateGuessWithGemini(guess, category);
     
     if (!isValid) {
       setGuesses(prev => prev.map(g => 
         g.word === guess ? { ...g, relation: 'invalid' } : g
       ));
-      // Remove invalid guesses after 3 seconds to clean up the UI
       setTimeout(() => {
         setGuesses(prev => prev.filter(g => g.word !== guess || g.relation !== 'invalid'));
       }, 3000);
       return;
     }
 
-    // Valid guess, compute alphabetical relation
     const comparison = guess.localeCompare(secretWord, 'fr', { sensitivity: 'base' });
     const relation = comparison < 0 ? 'before' : 'after';
     
@@ -181,7 +167,6 @@ export function GameScreen({ secretWord, category, difficulty, validWords, onWin
             </span>
           </h2>
           
-          {/* Visual Progress Bar */}
           <div className="w-full max-w-md mx-auto">
             <div className="flex justify-between text-xs font-bold text-stone-400 dark:text-stone-500 mb-2 px-1">
               <span className={lowerBound ? 'text-indigo-600 dark:text-indigo-400' : ''}>
@@ -307,10 +292,10 @@ export function GameScreen({ secretWord, category, difficulty, validWords, onWin
               <button
                 type="button"
                 onClick={handleHint}
-                disabled={hintsUsed >= 3 || isFetchingHint}
+                disabled={hintsUsed >= 3}
                 className="flex items-center text-sm text-amber-600 dark:text-amber-500 hover:text-amber-700 dark:hover:text-amber-400 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {isFetchingHint ? <Loader2 className="w-4 h-4 mr-1.5 animate-spin" /> : <Lightbulb className="w-4 h-4 mr-1.5" />}
+                <Lightbulb className="w-4 h-4 mr-1.5" />
                 Indice ({3 - hintsUsed})
               </button>
               <button

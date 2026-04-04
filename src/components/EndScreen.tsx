@@ -1,29 +1,18 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { motion } from 'motion/react';
 import { Trophy, RotateCcw, Frown, Sparkles } from 'lucide-react';
-import { generateFunFact } from '../lib/gemini';
+import { type GameData } from '../lib/gemini';
 
 interface EndScreenProps {
-  secretWord: string;
+  gameData: GameData;
   category: string;
   guesses: string[];
   isWin: boolean;
   onPlayAgain: () => void;
 }
 
-export function EndScreen({ secretWord, category, guesses, isWin, onPlayAgain }: EndScreenProps) {
-  const [funFact, setFunFact] = useState<string>('');
-  const [isLoadingFact, setIsLoadingFact] = useState(true);
-
-  useEffect(() => {
-    const fetchFact = async () => {
-      setIsLoadingFact(true);
-      const fact = await generateFunFact(secretWord, category);
-      setFunFact(fact);
-      setIsLoadingFact(false);
-    };
-    fetchFact();
-  }, [secretWord, category]);
+export function EndScreen({ gameData, guesses, isWin, onPlayAgain }: EndScreenProps) {
+  const { word: secretWord, funFact } = gameData;
 
   return (
     <div className="min-h-screen bg-transparent flex flex-col items-center justify-center p-6">
@@ -70,16 +59,9 @@ export function EndScreen({ secretWord, category, guesses, isWin, onPlayAgain }:
             <Sparkles className="w-4 h-4" />
             <span className="text-sm uppercase tracking-wider">Le saviez-vous ?</span>
           </div>
-          {isLoadingFact ? (
-            <div className="space-y-2 animate-pulse">
-              <div className="h-4 bg-amber-200/50 dark:bg-amber-800/30 rounded w-full"></div>
-              <div className="h-4 bg-amber-200/50 dark:bg-amber-800/30 rounded w-5/6"></div>
-            </div>
-          ) : (
-            <p className="text-sm text-amber-900 dark:text-amber-200/80 leading-relaxed">
-              {funFact}
-            </p>
-          )}
+          <p className="text-sm text-amber-900 dark:text-amber-200/80 leading-relaxed">
+            {funFact}
+          </p>
         </div>
 
         <button
