@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">AlphaDevinette</string>
+    <string name="title_activity_main">AlphaDevinette</string>
+    <string name="package_name">com.armaldio.alphadevinette</string>
+    <string name="custom_url_scheme">com.armaldio.alphadevinette</string>
+</resources>
