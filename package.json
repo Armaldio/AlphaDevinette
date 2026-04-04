@@ -11,7 +11,8 @@
     "lint": "tsc --noEmit",
     "cap:sync": "npx cap sync",
     "cap:open": "npx cap open android",
-    "cap:build": "npm run build && npx cap sync android"
+    "cap:build": "npm run build && npx cap sync android",
+    "version": "node scripts/sync-version.js && git add android/app/build.gradle"
   },
   "dependencies": {
     "@capacitor/android": "^8.3.0",
