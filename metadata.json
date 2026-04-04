@@ -1,0 +1,5 @@
+{
+  "name": "AlphaGuess",
+  "description": "An alphabetical word-guessing game where you narrow down the secret word by guessing words before or after it in the dictionary.",
+  "requestFramePermissions": []
+}
