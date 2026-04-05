@@ -8,8 +8,9 @@ import { StartScreen } from './components/StartScreen';
 import { GameScreen } from './components/GameScreen';
 import { EndScreen } from './components/EndScreen';
 import { generateGameData, type GameData } from './lib/gemini';
-import { Moon, Sun } from 'lucide-react';
 import { Toaster, toast } from 'sonner';
+import { SettingsModal } from './components/SettingsModal';
+import { AnimatePresence } from 'motion/react';
 
 type GameState = 'start' | 'playing' | 'won' | 'lost';
 
@@ -21,6 +22,7 @@ export default function App() {
   const [guesses, setGuesses] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
   useEffect(() => {
     if (isDarkMode) {
@@ -74,16 +76,24 @@ export default function App() {
   return (
     <div className="font-sans antialiased selection:bg-indigo-200 selection:text-indigo-900 min-h-screen bg-stone-50 dark:bg-stone-950 text-stone-900 dark:text-stone-50 transition-colors duration-300">
       <Toaster position="top-center" richColors />
-      <button
-        onClick={() => setIsDarkMode(!isDarkMode)}
-        className="fixed top-4 right-4 z-50 p-2 rounded-full bg-stone-200 dark:bg-stone-800 text-stone-600 dark:text-stone-300 hover:bg-stone-300 dark:hover:bg-stone-700 transition-colors"
-        aria-label="Toggle dark mode"
-      >
-        {isDarkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
-      </button>
+      
+      <AnimatePresence>
+        {isSettingsOpen && (
+          <SettingsModal 
+            isOpen={isSettingsOpen} 
+            onClose={() => setIsSettingsOpen(false)} 
+            isDarkMode={isDarkMode} 
+            onToggleTheme={() => setIsDarkMode(!isDarkMode)} 
+          />
+        )}
+      </AnimatePresence>
 
       {gameState === 'start' && (
-        <StartScreen onStart={handleStart} isLoading={isLoading} />
+        <StartScreen 
+          onStart={handleStart} 
+          isLoading={isLoading} 
+          onOpenSettings={() => setIsSettingsOpen(true)}
+        />
       )}
       
       {gameState === 'playing' && gameData && (

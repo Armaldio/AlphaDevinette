@@ -5,7 +5,7 @@ import { GoogleGenAI, Type } from "@google/genai";
 // @ts-ignore - process is injected by the environment
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
-const MODEL_NAME = "gemini-2.0-flash";
+const MODEL_NAME = "gemini-3.1-flash-lite-preview";
 
 export interface GameData {
   word: string;
@@ -98,16 +98,17 @@ export async function generateRandomCategories(): Promise<string[]> {
   try {
     const response = await fetchWithRetry(() => ai.models.generateContent({
       model: MODEL_NAME,
-      contents: `Génère une liste de 6 idées de catégories très connues pour un jeu de devinettes. 
-      Les catégories doivent être en français, simples, et variées. 
-      N'inclus pas de descriptions, juste les noms.`,
+      contents: `Génère 6 idées de catégories pour un jeu de devinettes. 
+      Mélange des catégories classiques (ex: Animaux) avec des catégories plus spécifiques, originales ou thématiques (ex: Explorateurs célèbres, Objets du futur, Créatures mythologiques). 
+      Sois créatif et surprenant, évite les suggestions trop "bateau".
+      Les catégories doivent être en français. N'inclus pas de descriptions, juste les noms.`,
       config: {
         responseMimeType: "application/json",
         responseSchema: {
           type: Type.ARRAY,
           items: { type: Type.STRING }
         },
-        temperature: 0.8
+        temperature: 1.0
       }
     }));
 
@@ -129,16 +130,37 @@ export async function generateCrazyCategory(): Promise<string> {
   try {
     const response = await fetchWithRetry(() => ai.models.generateContent({
       model: MODEL_NAME,
-      contents: `Invente UNE SEULE catégorie complètement absurde ou drôle pour un jeu de devinettes. 
-      Renvoie uniquement le nom de la catégorie en français.`,
+      contents: `Invente UNE SEULE catégorie totalement insolite, absurde, niche ou extrêmement spécifique pour un jeu de devinettes. 
+      Exemple d'esprit : "Choses qu'on trouve au fond d'un canapé", "Métiers qui n'existent plus", "Lieux hantés célèbres".
+      Sois audacieux et original. Renvoie uniquement le nom de la catégorie en français.`,
       config: {
-        temperature: 0.9
+        temperature: 1.0
       }
     }));
     return response.text?.trim() || "Objets trouvés dans la poche d'un magicien";
   } catch (error) {
     console.error("Error generating crazy category:", error);
     return "Objets trouvés dans la poche d'un magicien";
+  }
+}
+
+export async function generateQuickPlayCategory(): Promise<string> {
+  try {
+    const response = await fetchWithRetry(() => ai.models.generateContent({
+      model: MODEL_NAME,
+      contents: `Propose UNE SEULE catégorie thématique pour un jeu de devinettes. 
+      La catégorie doit être "casual" et TRES ACCESSIBLE au grand public (famille, amis).
+      Elle doit être fun et évocatrice, mais pas obscure ni trop niche.
+      Exemples de ton recherché : "Super-héros de comics", "Marques de sodas célèbres", "Desserts classiques", "Films d'animation Disney", "Destinations touristiques mondiales".
+      Renvoie uniquement le nom de la catégorie en français.`,
+      config: {
+        temperature: 0.4
+      }
+    }));
+    return response.text?.trim() || "Célébrités mondiales";
+  } catch (error) {
+    console.error("Error generating quick play category:", error);
+    return "Célébrités mondiales";
   }
 }
 

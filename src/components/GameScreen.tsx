@@ -153,15 +153,16 @@ export function GameScreen({ gameData, category, difficulty, onWin, onGiveUp }: 
   return (
     <div className="min-h-screen bg-transparent flex flex-col">
       {/* Header / Bounds Display */}
-      <div className="sticky top-0 z-10 bg-stone-50/80 dark:bg-stone-950/80 backdrop-blur-md border-b border-stone-200 dark:border-stone-800 px-6 py-6 shadow-sm">
-        <div className="max-w-3xl mx-auto flex flex-col items-center justify-center space-y-6">
-          <h2 className="text-sm font-bold tracking-widest text-stone-400 dark:text-stone-500 uppercase flex items-center justify-center gap-2">
-            <span>Catégorie : {category}</span>
-            <span className="w-1 h-1 rounded-full bg-stone-300 dark:bg-stone-600"></span>
-            <span className={`
-              ${difficulty === 'facile' ? 'text-emerald-500 dark:text-emerald-400' : ''}
-              ${difficulty === 'moyen' ? 'text-amber-500 dark:text-amber-400' : ''}
-              ${difficulty === 'difficile' ? 'text-rose-500 dark:text-rose-400' : ''}
+      <div className="sticky top-0 z-20 bg-stone-50/95 dark:bg-stone-950/95 backdrop-blur-md border-b border-stone-200 dark:border-stone-800 px-4 py-4 sm:px-6 sm:py-6 shadow-md inter-container">
+        <div className="max-w-3xl mx-auto flex flex-col items-center justify-center space-y-4 sm:space-y-6">
+          <h2 className="text-xs sm:text-sm font-bold tracking-widest text-stone-600 dark:text-stone-400 uppercase flex flex-wrap items-center justify-center gap-x-3 gap-y-1">
+            <span className="opacity-70">Catégorie :</span>
+            <span className="text-stone-900 dark:text-white">{category}</span>
+            <span className="hidden sm:block w-1.5 h-1.5 rounded-full bg-stone-300 dark:bg-stone-600"></span>
+            <span className={`px-2 py-0.5 rounded-md text-[10px] sm:text-xs font-black
+              ${difficulty === 'facile' ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-400' : ''}
+              ${difficulty === 'moyen' ? 'bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-400' : ''}
+              ${difficulty === 'difficile' ? 'bg-rose-100 text-rose-700 dark:bg-rose-500/20 dark:text-rose-400' : ''}
             `}>
               {difficulty}
             </span>
@@ -199,7 +200,7 @@ export function GameScreen({ gameData, category, difficulty, onWin, onGiveUp }: 
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.9, transition: { duration: 0.2 } }}
                 className={`
-                  flex items-center justify-between p-4 rounded-xl border transition-colors duration-300
+                  flex items-center justify-between p-3 sm:p-4 rounded-xl border transition-colors duration-300
                   ${g.relation === 'exact' 
                     ? 'bg-emerald-50 dark:bg-emerald-900/20 border-emerald-200 dark:border-emerald-800/30 text-emerald-800 dark:text-emerald-300' 
                     : g.relation === 'invalid'
@@ -221,33 +222,33 @@ export function GameScreen({ gameData, category, difficulty, onWin, onGiveUp }: 
                   </div>
                 ) : (
                   <>
-                    <span className="text-lg font-medium tracking-wide uppercase">
+                    <span className="text-base sm:text-lg font-medium tracking-wide uppercase">
                       {g.relation === 'exact' ? secretWord : g.word}
                     </span>
-                    <div className="flex items-center space-x-2 text-sm font-medium">
+                    <div className="flex items-center space-x-2 text-[10px] sm:text-sm font-medium">
                       {g.relation === 'pending' && (
-                        <span className="flex items-center text-stone-500 dark:text-stone-400 bg-stone-200/50 dark:bg-stone-800 px-3 py-1 rounded-full">
-                          Vérification... <Loader2 className="w-4 h-4 ml-2 animate-spin" />
+                        <span className="flex items-center text-stone-500 dark:text-stone-400 bg-stone-200/50 dark:bg-stone-800 px-2 py-0.5 sm:px-3 sm:py-1 rounded-full">
+                          Vérification... <Loader2 className="w-3 h-3 sm:w-4 sm:h-4 ml-1.5 sm:ml-2 animate-spin" />
                         </span>
                       )}
                       {g.relation === 'invalid' && (
-                        <span className="flex items-center text-rose-600 dark:text-rose-400 bg-rose-100 dark:bg-rose-900/40 px-3 py-1 rounded-full">
-                          Hors catégorie <XCircle className="w-4 h-4 ml-1" />
+                        <span className="flex items-center text-rose-600 dark:text-rose-400 bg-rose-100 dark:bg-rose-900/40 px-2 py-0.5 sm:px-3 sm:py-1 rounded-full">
+                          Hors catégorie <XCircle className="w-3 h-3 sm:w-4 sm:h-4 ml-1" />
                         </span>
                       )}
                       {g.relation === 'before' && (
-                        <span className="flex items-center text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/40 px-3 py-1 rounded-full">
-                          Le mot est après <ArrowDown className="w-4 h-4 ml-1" />
+                        <span className="flex items-center text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/40 px-2 py-0.5 sm:px-3 sm:py-1 rounded-full">
+                          Le mot est après <ArrowDown className="w-3 h-3 sm:w-4 sm:h-4 ml-1" />
                         </span>
                       )}
                       {g.relation === 'after' && (
-                        <span className="flex items-center text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-900/40 px-3 py-1 rounded-full">
-                          Le mot est avant <ArrowUp className="w-4 h-4 ml-1" />
+                        <span className="flex items-center text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-900/40 px-2 py-0.5 sm:px-3 sm:py-1 rounded-full">
+                          Le mot est avant <ArrowUp className="w-3 h-3 sm:w-4 sm:h-4 ml-1" />
                         </span>
                       )}
                       {g.relation === 'exact' && (
-                        <span className="flex items-center text-emerald-600 dark:text-emerald-400 bg-emerald-100 dark:bg-emerald-900/40 px-3 py-1 rounded-full">
-                          Trouvé ! <CheckCircle2 className="w-4 h-4 ml-1" />
+                        <span className="flex items-center text-emerald-600 dark:text-emerald-400 bg-emerald-100 dark:bg-emerald-900/40 px-2 py-0.5 sm:px-3 sm:py-1 rounded-full">
+                          Trouvé ! <CheckCircle2 className="w-3 h-3 sm:w-4 sm:h-4 ml-1" />
                         </span>
                       )}
                     </div>
@@ -261,7 +262,7 @@ export function GameScreen({ gameData, category, difficulty, onWin, onGiveUp }: 
       </div>
 
       {/* Input Area */}
-      <div className="bg-white dark:bg-stone-900 border-t border-stone-200 dark:border-stone-800 p-6">
+      <div className="bg-white dark:bg-stone-900 border-t border-stone-200 dark:border-stone-800 p-4 sm:p-6 inter-container">
         <div className="max-w-xl mx-auto">
           <form onSubmit={handleSubmit} className="relative">
             <input
@@ -270,7 +271,7 @@ export function GameScreen({ gameData, category, difficulty, onWin, onGiveUp }: 
               value={input}
               onChange={(e) => setInput(e.target.value)}
               placeholder="Tapez votre proposition..."
-              className="w-full pl-6 pr-16 py-4 text-lg bg-stone-100 dark:bg-stone-800 border-2 border-transparent rounded-full focus:bg-white dark:focus:bg-stone-900 focus:border-indigo-500 dark:focus:border-indigo-400 focus:ring-0 transition-all outline-none uppercase tracking-wide text-stone-900 dark:text-white placeholder-stone-400 dark:placeholder-stone-500"
+              className="w-full pl-4 pr-12 py-3 text-base sm:pl-6 sm:pr-16 sm:py-4 sm:text-lg bg-stone-100 dark:bg-stone-800 border-2 border-transparent rounded-full focus:bg-white dark:focus:bg-stone-900 focus:border-indigo-500 dark:focus:border-indigo-400 focus:ring-0 transition-all outline-none uppercase tracking-wide text-stone-900 dark:text-white placeholder-stone-400 dark:placeholder-stone-500"
               autoComplete="off"
               autoCorrect="off"
               spellCheck="false"
@@ -278,9 +279,9 @@ export function GameScreen({ gameData, category, difficulty, onWin, onGiveUp }: 
             <button
               type="submit"
               disabled={!input.trim()}
-              className="absolute right-2 top-2 bottom-2 aspect-square flex items-center justify-center bg-indigo-600 text-white rounded-full hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="absolute right-1.5 top-1.5 bottom-1.5 aspect-square flex items-center justify-center bg-indigo-600 text-white rounded-full hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
-              <Send className="w-5 h-5 ml-1" />
+              <Send className="w-4 h-4 sm:w-5 sm:h-5 ml-1" />
             </button>
           </form>
           

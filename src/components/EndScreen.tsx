@@ -19,7 +19,7 @@ export function EndScreen({ gameData, guesses, isWin, onPlayAgain }: EndScreenPr
       <motion.div
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="max-w-md w-full bg-white dark:bg-stone-800 rounded-3xl p-8 md:p-12 text-center shadow-2xl border border-stone-200 dark:border-stone-700"
+        className="max-w-md w-full bg-white dark:bg-stone-800 rounded-3xl p-6 sm:p-8 md:p-12 text-center shadow-2xl border border-stone-200 dark:border-stone-700 mx-auto"
       >
         <div className="flex justify-center mb-6">
           {isWin ? (
@@ -33,11 +33,11 @@ export function EndScreen({ gameData, guesses, isWin, onPlayAgain }: EndScreenPr
           )}
         </div>
 
-        <h2 className="text-3xl md:text-4xl font-bold mb-2 text-stone-900 dark:text-white">
+        <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2 text-stone-900 dark:text-white">
           {isWin ? 'Bravo !' : 'Partie terminée'}
         </h2>
         
-        <p className="text-stone-500 dark:text-stone-400 mb-8 text-lg">
+        <p className="text-stone-500 dark:text-stone-400 mb-4 sm:mb-8 text-base sm:text-lg">
           {isWin ? (
             <>Vous avez trouvé le mot en <span className="text-stone-900 dark:text-white font-bold">{guesses.length}</span> essais.</>
           ) : (
@@ -45,11 +45,11 @@ export function EndScreen({ gameData, guesses, isWin, onPlayAgain }: EndScreenPr
           )}
         </p>
 
-        <div className="bg-stone-50 dark:bg-stone-900 rounded-2xl p-6 mb-6 border border-stone-200 dark:border-stone-700">
-          <p className="text-sm text-stone-500 dark:text-stone-400 uppercase tracking-widest font-semibold mb-2">
+        <div className="bg-stone-50 dark:bg-stone-900 rounded-2xl p-4 sm:p-6 mb-4 sm:mb-6 border border-stone-200 dark:border-stone-700">
+          <p className="text-[10px] sm:text-sm text-stone-500 dark:text-stone-400 uppercase tracking-widest font-semibold mb-1 sm:mb-2">
             Le mot secret était
           </p>
-          <p className="text-4xl font-bold tracking-widest uppercase text-indigo-600 dark:text-indigo-400">
+          <p className="text-2xl sm:text-4xl font-bold tracking-widest uppercase text-indigo-600 dark:text-indigo-400">
             {secretWord}
           </p>
         </div>
